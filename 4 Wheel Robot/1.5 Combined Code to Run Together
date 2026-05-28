@@ -1,4 +1,4 @@
-Main_Robot.ino
+//Main_Robot.ino
 #include <DHT.h>
 #include <Adafruit_Sensor.h>
 
@@ -21,9 +21,9 @@ void loop(){
   ControlDHT();
 }
 
-LCD_Display.ino
+//LCD_Display.ino
 
-TempHumidSens.ino
+//TempHumidSens.ino
 void SetupDHT()
 {
   Serial.println("Begin Test");
@@ -43,7 +43,7 @@ void ControlDHT()
   delay(2000);
 }
 
-MotorControl.ino
+//MotorControl.ino
 void SetupMotors()
 {
   Serial.begin(9600);
@@ -164,7 +164,7 @@ void ControlMotors()
   delay(100);
 }
 
-MillisFunction.ino
+//MillisFunction.ino
 unsigned long previousMillis = 0;
 
 void Millis(int interval) {
