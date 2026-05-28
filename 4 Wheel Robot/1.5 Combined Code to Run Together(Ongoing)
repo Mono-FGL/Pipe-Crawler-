@@ -3,25 +3,20 @@
 #include <Adafruit_Sensor.h>
 
 //initiailize
-DHT dht(2, DHT11);
-
-//LCD 
-#include <LiquidCrystal.h>
+DHT dht(7, DHT11); // (pin, DhtType)
 
 void setup(){
   Serial.begin(9600);
+  dht.begin();
+  analogReadResolution(10);
   SetupMotors();
   SetupDHT();
-  dht.begin();
 }
-
 
 void loop(){
   ControlMotors();
   ControlDHT();
 }
-
-//LCD_Display.ino
 
 //TempHumidSens.ino
 void SetupDHT()
@@ -31,23 +26,29 @@ void SetupDHT()
 
 void ControlDHT()
 {
-  Serial.println();
+  static unsigned long previousMillis = 0;
+  unsigned long currentMillis = millis();
+  int interval = 2000;
+
+  if(currentMillis - previousMillis >= interval)
+  {
+    Serial.println();
   
-  float temp = dht.readTemperature();
-  float humidity = dht.readHumidity();
+    float temp = dht.readTemperature();
+    float humidity = dht.readHumidity();
   
-  Serial.print(F("Temperature: "));
-  Serial.println(temp);
-  Serial.print(F("Humidity: "));
-  Serial.println(humidity);
-  delay(2000);
+    Serial.print(F("Temperature: "));
+    Serial.println(temp);
+    Serial.print(F("Humidity: "));
+    Serial.println(humidity);
+
+    previousMillis = currentMillis;
+  }
 }
 
 //MotorControl.ino
 void SetupMotors()
 {
-  Serial.begin(9600);
-
     // Pins for motor speed
   pinMode(2, OUTPUT);
   pinMode(3, OUTPUT);
@@ -62,17 +63,13 @@ void SetupMotors()
 
 void ControlMotors()
 {
-  float x = analogRead(A2) - 237;
+  float x = analogRead(A2) - 237;  
   float y = analogRead(A1) - 272;
 
-  //GoingFoward
+  //State 1: GoingFoward
   if(y > 600)
   {
-    digitalWrite(22, HIGH);
-    digitalWrite(24, HIGH);
-    digitalWrite(26, HIGH);
-    digitalWrite(28, HIGH);
-    //Turning
+    //Turning Left
     if(x < 300)
     {
       analogWrite(3, 75);
@@ -85,7 +82,7 @@ void ControlMotors()
     digitalWrite(26, HIGH);
     digitalWrite(28, LOW);
     }
-    
+    //Turning Right
     else if(x > 650)
     {
       analogWrite(2, 75);
@@ -93,28 +90,29 @@ void ControlMotors()
       analogWrite(3, 250);
       analogWrite(5, 250);
      
-    digitalWrite(22, LOW);
-    digitalWrite(24, HIGH);
-    digitalWrite(26, LOW);
-    digitalWrite(28, HIGH);
-  
+      digitalWrite(22, LOW);
+      digitalWrite(24, HIGH);
+      digitalWrite(26, LOW);
+      digitalWrite(28, HIGH);
     }
+    //Straight Foward
     else
     {
       analogWrite(2, 200);
       analogWrite(4, 200);
       analogWrite(3, 200);
       analogWrite(5, 200);
+
+      digitalWrite(22, HIGH);
+      digitalWrite(24, HIGH);
+      digitalWrite(26, HIGH);
+      digitalWrite(28, HIGH);
     }
   }
-  //GoingBacwards
-  if(y < 300)
+  //State 2: GoingBacwards
+  else if(y < 300)
   {
-    digitalWrite(22, LOW);
-    digitalWrite(24, LOW);
-    digitalWrite(26, LOW);
-    digitalWrite(28, LOW);
-    //Turning
+    //Turning Left While Reversing
     if(x < 300)
     {
       analogWrite(3, 75);
@@ -122,12 +120,12 @@ void ControlMotors()
       analogWrite(2, 250);
       analogWrite(4, 250);
 
-    digitalWrite(22, HIGH);
-    digitalWrite(24, LOW);
-    digitalWrite(26, HIGH);
-    digitalWrite(28, LOW);
-
+      digitalWrite(22, HIGH);
+      digitalWrite(24, LOW);
+      digitalWrite(26, HIGH);
+      digitalWrite(28, LOW);
     }
+    //Turning Right While Reversing
     else if(x > 650)
     {
       analogWrite(2, 75);
@@ -135,43 +133,43 @@ void ControlMotors()
       analogWrite(3, 250);
       analogWrite(5, 250);
 
-    digitalWrite(22, LOW);
-    digitalWrite(24, HIGH);
-    digitalWrite(26, LOW);
-    digitalWrite(28, HIGH);
-
+     digitalWrite(22, LOW);
+      digitalWrite(24, HIGH);
+      digitalWrite(26, LOW);
+      digitalWrite(28, HIGH);
     }
+    //Straight Backwards
     else
     {
       analogWrite(2, 200);
       analogWrite(4, 200);
       analogWrite(3, 200);
       analogWrite(5, 200);
+
+      digitalWrite(22, LOW);
+      digitalWrite(24, LOW);
+      digitalWrite(26, LOW);
+      digitalWrite(28, LOW);
     }
   }
-  //Staying Still
-  if(y > 400 && y < 600)
+  //State 3: Staying Still
+  else
   {
     analogWrite(2, 0);
     analogWrite(3, 0);
     analogWrite(4, 0);
     analogWrite(5, 0);
   }
-
-  Serial.print(x);
-  Serial.print("\t");
-  Serial.println(y);
-  delay(100);
-}
-
-//MillisFunction.ino
-unsigned long previousMillis = 0;
-
-void Millis(int interval) {
+  //Non-blocking "delay"
+  static unsigned long previousMillis = 0;
   unsigned long currentMillis = millis();
+  int interval = 500;
 
-  if(currentMillis - previousMillis >= interval) {
+  if(currentMillis - previousMillis >= interval)
+  {
     previousMillis = currentMillis;
+    Serial.print(x);
+    Serial.print("\t");
+    Serial.println(y);
   }
 }
-
