@@ -1,48 +1,96 @@
+/* 
+Finally doneeee, comments featuring .ino is the start of a new tab in arduino.
+Careful on DHT11 if pushed too far in it will report nan
+*/
 //Main_Robot.ino
 #include <DHT.h>
 #include <Adafruit_Sensor.h>
+#include <SPI.h>
+#include <SD.h> 
 
-//initiailize
+//DHT 
 DHT dht(7, DHT11); // (pin, DhtType)
+struct SensorsData
+  {
+    float Temp;
+    float Humidity;
+  };
+  SensorsData data;
+File myFile;
+
+const int CS = 10;
 
 void setup(){
   Serial.begin(9600);
   dht.begin();
+  SD.begin();
+  SetupDHT();
+  SetupSD();
   analogReadResolution(10);
   SetupMotors();
-  SetupDHT();
 }
 
 void loop(){
   ControlMotors();
   ControlDHT();
+  ControlSD();
 }
 
 //TempHumidSens.ino
 void SetupDHT()
 {
-  Serial.println("Begin Test");
+  Serial.println("Begin Reading");
 }
 
-void ControlDHT()
+SensorsData ControlDHT()
 {
   static unsigned long previousMillis = 0;
   unsigned long currentMillis = millis();
-  int interval = 2000;
+  int interval = 2000; 
 
   if(currentMillis - previousMillis >= interval)
   {
     Serial.println();
   
-    float temp = dht.readTemperature();
-    float humidity = dht.readHumidity();
+    data.Temp = dht.readTemperature();
+    data.Humidity = dht.readHumidity();
   
     Serial.print(F("Temperature: "));
-    Serial.println(temp);
+    Serial.println(data.Temp);
     Serial.print(F("Humidity: "));
-    Serial.println(humidity);
-
+    Serial.println(data.Humidity);
     previousMillis = currentMillis;
+    return data;
+  }
+}
+
+void SetupSD()
+{
+  pinMode(CS, OUTPUT);
+  if (!SD.begin(CS)) 
+  {
+    Serial.println("It's a broke");  //SD card not in
+    while(1); //While true
+  }
+}
+
+void ControlSD()
+{
+  static unsigned long previousMillis = 0;
+  unsigned long currentMillis = millis();
+  int interval = 2000;
+
+  if (currentMillis - previousMillis >= interval)
+ {
+    myFile = SD.open("TempHum.txt", FILE_WRITE);
+    myFile.print("Temp:");
+    myFile.print(data.Temp);
+    myFile.print("\t");
+    myFile.print("Humidity:");
+    myFile.println(data.Humidity);
+    myFile.close();
+    previousMillis = currentMillis;
+    Serial.print("Printing Temp...");
   }
 }
 
