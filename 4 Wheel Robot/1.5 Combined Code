@@ -1,8 +1,9 @@
 /* 
-Finally doneeee, comments featuring .ino is the start of a new tab in arduino.
-Careful on DHT11 if pushed too far in it will report nan
+ - Finally doneeee, comments featuring .ino is the start of a new tab in arduino.
+ - Careful on DHT11 if pushed too far in it will report nan
+ - Need to upload everytime u take out SD card
 */
-//Main_Robot.ino
+//A_Main_Robot.ino
 #include <DHT.h>
 #include <Adafruit_Sensor.h>
 #include <SPI.h>
@@ -36,7 +37,7 @@ void loop(){
   ControlSD();
 }
 
-//TempHumidSens.ino
+//B_TempHumidSens.ino
 void SetupDHT()
 {
   Serial.println("Begin Reading");
@@ -64,12 +65,13 @@ SensorsData ControlDHT()
   }
 }
 
+//C_SD_Card.ino
 void SetupSD()
 {
   pinMode(CS, OUTPUT);
   if (!SD.begin(CS)) 
   {
-    Serial.println("It's a broke");  //SD card not in
+    Serial.println("SD Card - It's a broke");  //SD card not in
     while(1); //While true
   }
 }
@@ -82,7 +84,7 @@ void ControlSD()
 
   if (currentMillis - previousMillis >= interval)
  {
-    myFile = SD.open("TempHum.txt", FILE_WRITE);
+    myFile = SD.open("Sensors.txt", FILE_WRITE);
     myFile.print("Temp:");
     myFile.print(data.Temp);
     myFile.print("\t");
@@ -90,11 +92,25 @@ void ControlSD()
     myFile.println(data.Humidity);
     myFile.close();
     previousMillis = currentMillis;
-    Serial.print("Printing Temp...");
+    Serial.println("Printing data :p");
+  }
+  //Erase file data 
+  //Have to upload everytime U take out SD Card
+  if(Serial.available())
+  {
+    String user_input = Serial.readStringUntil('\n');
+    user_input.trim();
+    if(user_input == "Erase data" && SD.exists("Sensors.txt"))
+    {
+      SD.remove("Sensors.txt");
+      Serial.println("============");
+      Serial.println("File removed");
+      Serial.println("============");
+    }
   }
 }
 
-//MotorControl.ino
+//D_MotorControl.ino
 void SetupMotors()
 {
     // Pins for motor speed
