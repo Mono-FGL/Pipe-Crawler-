@@ -1,6 +1,7 @@
 /* 
  - Finally doneeee, comments featuring .ino is the start of a new tab in arduino.
  - Careful on DHT11 if pushed too far in it will report nan
+ - Battery must be on for DHT to work too
  - Need to upload everytime u take out SD card
 */
 //A_Main_Robot.ino
