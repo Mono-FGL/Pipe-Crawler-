@@ -1,3 +1,5 @@
+//RTAB MAP only takes Quaternions
+
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
@@ -16,6 +18,8 @@ void setup()
     Serial.print("BNO not found, check connection");
     while(1);
   }
+  //Sets mode to IMU
+  bno.setMode(OPERATION_MODE_IMUPLUS);
   delay(2000);
 
   //Uses external crystal for better accuracy
