@@ -1,21 +1,30 @@
+// Left side
 // Hardware Pins
-const int ENCODER_A = 2; 
-const int ENCODER_B = 3;
-
+const int ENCODER_LEFT_A = 2; 
+const int ENCODER_LEFT_B = 3;
 // Telemetry Variables
-volatile long encoderTicks = 0;
-const double DISTANCE_PER_TICK = 0.876559; // mm per tick (471.24 / 537.6)
+volatile long LeftTicks = 0;
 
+// Right side
+// Hardware Pins
+const int ENCODER_RIGHT_A = 4; 
+const int ENCODER_RIGHT_B = 5;
+// Telemetry Variables
+volatile long RightTicks = 0;
+
+
+// mm per tick (471.24 / 537.6) or (pi x diameter(mm) / total ticks per revolution)
+const double DISTANCE_PER_TICK = 0.876559;
 void SetupRotary()
 {
-  pinMode(ENCODER_A, INPUT_PULLUP);
-  pinMode(ENCODER_B, INPUT_PULLUP);
+  pinMode(ENCODER_LEFT_A, INPUT_PULLUP);
+  pinMode(ENCODER_LEFT_B, INPUT_PULLUP);
+  pinMode(ENCODER_RIGHT_A, INPUT_PULLUP);
+  pinMode(ENCODER_RIGHT_B, INPUT_PULLUP);
   
   // Trigger interrupt when Signal A changes from LOW to HIGH
-  attachInterrupt(digitalPinToInterrupt(ENCODER_A), doEncoder, RISING);
-
-  pinMode(8, OUTPUT);
-  pinMode(9, OUTPUT);
+  attachInterrupt(digitalPinToInterrupt(ENCODER_LEFT_A), doLeftEncoder, RISING);
+  attachInterrupt(digitalPinToInterrupt(ENCODER_RIGHT_A), doRightEncoder, RISING);
 }
 
 void ControlRotary() {
@@ -26,29 +35,27 @@ void ControlRotary() {
 
   if (currentMillis - previousMillis >= interval)
  {
-  double distanceTraveled = encoderTicks * DISTANCE_PER_TICK;
+  Long averageTicks = (LeftTicks + RightTicks) / 2;
+
+  double distanceTraveled = averageTicks * DISTANCE_PER_TICK;
   
-  Serial.print("Ticks: ");
-  Serial.print(encoderTicks);
-  Serial.print(" | Distance: ");
+  Serial.print(averageTicks);
+  Serial.print(",");
   Serial.print((distanceTraveled / 1000));
-  Serial.print(" m");
-  Serial.print(" | Displacement: ");
-  Serial.println();
   previousMillis = currentMillis;
  }
 }
 
-// ISR: Runs instantly every time Signal A goes HIGH
-void doEncoder() {
-  // If A and B are different, motor is spinning forward
-  /* As soon as B changes it evaluates and sends it to false
-     else A returns true and ticks++
-  */
-  // if (digitalRead(ENCODER_A) != digitalRead(ENCODER_B)) {
-  //   encoderTicks++;
-  // } else {
-  //   encoderTicks--;
-  // }
-  encoderTicks++;
+void doLeftEncoder() {
+  if(digitalRead(Encoder_LEFT_B) == LOW)
+    LeftTicks++;
+  else
+    LeftTicks--;
+}
+
+void doRightEncoder() {
+  if(digitalRead(Encoder_RIGHT_B) == LOW)
+    RightTicks++;
+  else
+    RightTicks--;
 }
