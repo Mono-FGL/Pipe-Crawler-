@@ -20,6 +20,12 @@ void SetupRotary()
 
 void ControlRotary() {
   // Calculate real-world distance
+  static unsigned long previousMillis = 0;
+  unsigned long currentMillis = millis();
+  int interval = 100;
+
+  if (currentMillis - previousMillis >= interval)
+ {
   double distanceTraveled = encoderTicks * DISTANCE_PER_TICK;
   
   Serial.print("Ticks: ");
@@ -29,16 +35,8 @@ void ControlRotary() {
   Serial.print(" m");
   Serial.print(" | Displacement: ");
   Serial.println();
-  
-  delay(100); // Simple telemetry delay
-
-  digitalWrite(8, LOW);
-  analogWrite(9, 150);
-  delay(1000);
-  
-  digitalWrite(8, HIGH);
-  analogWrite(9, 150);
-  delay(1000);
+  previousMillis = currentMillis;
+ }
 }
 
 // ISR: Runs instantly every time Signal A goes HIGH
