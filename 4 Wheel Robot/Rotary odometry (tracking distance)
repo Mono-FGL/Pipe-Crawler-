@@ -15,6 +15,9 @@ volatile long RightTicks = 0;
 
 // mm per tick (471.24 / 537.6) or (pi x diameter(mm) / total ticks per revolution)
 const double DISTANCE_PER_TICK = 0.876559;
+
+float prev_left = 0;
+float prev_right = 0;
 void SetupRotary()
 {
   pinMode(ENCODER_LEFT_A, INPUT_PULLUP);
@@ -28,24 +31,28 @@ void SetupRotary()
 }
 
 void ControlRotary() {
-  // Calculate real-world distance
+  /* Find the average tick change by finding the difference of tottal ticks
+  minus previous total ticks. Then multiply by total distance per tick (fixed number)
+  */
+  float AverageTickChange = ((( LeftTicks - prev_left) + (RightTicks - prev_right)) / 2);
+  float distanceTraveled = AverageTickChange * DISTANCE_PER_TICK;
+
+  //Millis for only Serial.print
   static unsigned long previousMillis = 0;
   unsigned long currentMillis = millis();
-  int interval = 100;
-
+  int interval = 2000;
   if (currentMillis - previousMillis >= interval)
  {
-  long averageTicks = (LeftTicks + RightTicks) / 2;
-
-  double distanceTraveled = averageTicks * DISTANCE_PER_TICK;
-  
-  Serial.print(averageTicks);
+  Serial.print(AverageTickChange);
   Serial.print(",");
   Serial.print((distanceTraveled / 1000));
   previousMillis = currentMillis;
  }
+  prev_left = LeftTicks;
+  prev_right = RightTicks;
 }
 
+//Change ticks depending on which wheel spins front or back 
 void doLeftEncoder() {
   if(digitalRead(ENCODER_LEFT_B) == LOW)
     LeftTicks++;
@@ -55,7 +62,7 @@ void doLeftEncoder() {
 
 void doRightEncoder() {
   if(digitalRead(ENCODER_RIGHT_B) == LOW)
-    RightTicks++;
-  else
     RightTicks--;
+  else
+    RightTicks++;
 }
