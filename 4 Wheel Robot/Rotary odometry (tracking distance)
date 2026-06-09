@@ -35,7 +35,7 @@ void ControlRotary() {
 
   if (currentMillis - previousMillis >= interval)
  {
-  Long averageTicks = (LeftTicks + RightTicks) / 2;
+  long averageTicks = (LeftTicks + RightTicks) / 2;
 
   double distanceTraveled = averageTicks * DISTANCE_PER_TICK;
   
@@ -47,14 +47,14 @@ void ControlRotary() {
 }
 
 void doLeftEncoder() {
-  if(digitalRead(Encoder_LEFT_B) == LOW)
+  if(digitalRead(ENCODER_LEFT_B) == LOW)
     LeftTicks++;
   else
     LeftTicks--;
 }
 
 void doRightEncoder() {
-  if(digitalRead(Encoder_RIGHT_B) == LOW)
+  if(digitalRead(ENCODER_RIGHT_B) == LOW)
     RightTicks++;
   else
     RightTicks--;
