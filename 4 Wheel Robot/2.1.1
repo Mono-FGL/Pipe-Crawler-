@@ -9,6 +9,31 @@ RTC_DS3231 rtc;
 hd44780_I2Cexp lcd; // Auto-detects backpack pinout and I2C address
 
 
+void setup() {
+  // Initialize serial communication
+  Serial.begin(9600);
+  
+  // Initialize the DHT sensor
+  dht.begin();
+  
+  // Initialize LCD and show boot message
+  lcd.begin(16, 2);
+  lcd.clear();
+  lcd.setCursor(1, 0);
+  lcd.print("Starting Clock");
+  delay(3000);
+  lcd.clear();
+  
+  // Initialize RTC
+  if (!rtc.begin()) {
+    Serial.println("Couldn't find RTC");
+    while (1); // Halt if RTC is missing
+  }
+  
+  // Adjust RTC time if necessary (Updates clock time to match compile timestamp)
+  rtc.adjust(DateTime(2026, 4, 21, 16, 26, 55));
+}
+
 
 void ControlLCD() {
 
