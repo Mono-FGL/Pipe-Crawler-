@@ -48,7 +48,7 @@ void ControlMotors()
       analogWrite(5, 150);
     }
     //Turning Right
-    else if(x > 650)
+    else if(x > 600)
     {
       if(LastTurn != 2)
       {
@@ -90,15 +90,15 @@ void ControlMotors()
         LastTurn = 1;
       }
       float AdjustedSpeed = Turning();
-      digitalWrite(24, HIGH);
-      digitalWrite(28, HIGH);
-      analogWrite(3, AdjustedSpeed);
-      analogWrite(5, AdjustedSpeed);
-      analogWrite(2, 150);
-      analogWrite(4, 150);
+      digitalWrite(22, HIGH);
+      digitalWrite(26, HIGH);
+      analogWrite(2, AdjustedSpeed);
+      analogWrite(4, AdjustedSpeed);
+      analogWrite(3, 150);
+      analogWrite(5, 150);
     }
     //Turning Right While Reversing
-    else if(x > 650)
+    else if(x > 600)
     {
       if(LastTurn != 2)
       {
@@ -106,12 +106,12 @@ void ControlMotors()
         LastTurn = 2;
       }
       float AdjustedSpeed = Turning();
-      digitalWrite(22, HIGH);
-      digitalWrite(26, HIGH);
-      analogWrite(2, AdjustedSpeed);
-      analogWrite(4, AdjustedSpeed);
-      analogWrite(3, 150);
-      analogWrite(5, 150);
+      digitalWrite(24, HIGH);
+      digitalWrite(28, HIGH);
+      analogWrite(3, AdjustedSpeed);
+      analogWrite(5, AdjustedSpeed);
+      analogWrite(2, 150);
+      analogWrite(4, 150);
     }
 
     //Straight Backwards
