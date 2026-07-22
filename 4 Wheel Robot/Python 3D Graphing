@@ -1,9 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 
-# 1. Load the data safely (fixes the KeyError)
-# It assigns headers to your 3 data columns and strips out hidden spaces
-file_path = r"C:\Users\jvher\Downloads\log14.p" # Update to your data file path if different
+file_path = r"C:\Users\jvher\Downloads\log19.p"
 try:
     df = pd.read_csv(
         file_path,
@@ -15,27 +13,30 @@ except Exception as e:
     print(f"Error reading file: {e}")
     exit()
 
-# 2. Extract your coordinates
 x = df["X"]
 y = df["Y"]
 z = df["Z"]
 
-# 3. Create the 3D plot
 fig = plt.figure(figsize=(10, 7))
 ax = fig.add_subplot(111, projection="3d")
 
-# Plot the data as a continuous 3D line
-ax.plot(x, y, z, label="3D Trajectory", color="blue", linewidth=2)
-
-# Add a scatter plot on top to see individual data points (optional)
+#ax.plot(x, y, z, label="3D Trajectory", color="blue", linewidth=2)
 ax.scatter(x, y, z, color="red", s=10, alpha=0.5)
 
-# Label the axes
-ax.set_xlabel("X Axis")
-ax.set_ylabel("Y Axis")
-ax.set_zlabel("Z Axis")
-ax.set_title("3D Plot of X, Y, Z Coordinates")
+# Add extra spaces as a manual "pad" workaround (avoids the labelpad bug)
+ax.set_xlabel("X Axis (m)", fontsize=14)
+ax.set_ylabel("Y Axis (m)   ", fontsize=14)  # trailing spaces push it out
+ax.set_zlabel("Z Axis (m)", fontsize=14)
+
+# Use fig.suptitle instead of ax.set_title to avoid the same bug
+fig.suptitle("3D Plot of X, Y, Z Coordinates", fontsize=16, y=0.95)
+
+# Tick number spacing (this one worked fine before, no labelpad involved)
+ax.tick_params(axis="both", labelsize=12, pad=8)
+
 ax.legend()
 
-# 4. Display the interactive window
+# Manually add margin around the plot instead of tight_layout
+fig.subplots_adjust(left=0.1, right=0.95, top=0.9, bottom=0.1)
+
 plt.show()
