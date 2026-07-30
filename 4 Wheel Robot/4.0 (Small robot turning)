@@ -1,3 +1,7 @@
+/*
+When turning uses millis to increment servo motor to turn
+/*
+
 float Servo = 1440;
 // 0 = straight, 1 = Left, 2 = Right
 // Able to reset MotorSpeed or left and right
